@@ -24,6 +24,6 @@ Scanner Tool includes the following features:
 
 Scanner Tool also includes an Admin Portal which is accessible once logged in using default credentials.
 
-Default Credentials:
+<b>Default Credentials:</b>
 Username: admin
 Password: admin123
