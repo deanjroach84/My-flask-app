@@ -7,7 +7,7 @@ Free online port scanner tool that identifies all open ports on your chosen IP a
 
 <b>Step 1:</b>
 <br>
-Input target IP address
+<i>Input target IP address</i>
 
 <b>Step 2:</b>
 <br>
