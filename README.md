@@ -28,6 +28,6 @@ Scanner Tool also includes an Admin Portal which is accessible once logged in us
 
 <b>Default Credentials:</b>
 <br>
-Username: admin
+<i>Username: admin</i>
 <br>
-Password: admin123
+<i>Password: admin123</i>
