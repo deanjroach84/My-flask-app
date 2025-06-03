@@ -1,15 +1,18 @@
 Web UX/UI Port Scanner Tool
 
-Free online open port scanner
+Free online port scanner tool that identifies all open ports on your chosen IP address. The Port Scanner Tool also tries to identify the services that are running on the open ports.
 
 
 Instructions:
 
-Step 1: Input target IP address
+Step 1:
+Input target IP address
 
-Step 2: Select ports to scan (eg 100, 1000, custom number)
+Step 2: 
+Select ports to scan (eg 100, 1000, custom number)
 
-Step 3: Click "Start Scan" Button
+Step 3: 
+Click "Start Scan" Button
 
 
 Scanner Tool includes the following features:
