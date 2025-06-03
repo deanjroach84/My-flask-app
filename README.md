@@ -24,7 +24,7 @@ Free online port scanner tool that identifies all open ports on your chosen IP a
 - Forgot password function which allows changing current password of user if forgotten.
 
 
-Scanner Tool also includes an Admin Portal which is accessible once logged in using default credentials.
+Scanner Tool also includes an <b>Admin Portal</b> which is accessible once logged in using default credentials.
 
 <b>Default Credentials:</b>
 <br>
