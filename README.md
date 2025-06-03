@@ -15,10 +15,12 @@ Step 3:
 Click "Start Scan" Button
 
 
+
 Scanner Tool includes the following features:
 - Dark mode activated at the touch of a button
 - Create a new user account to use Scanner tool
 - Forgot password function which allows changing current password of user if forgotten.
+
 
 Scanner Tool also includes an Admin Portal which is accessible once logged in using default credentials.
 
