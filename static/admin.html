@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>User Management - Admin Panel</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<style>
+  body {
+    transition: background 0.3s, color 0.3s;
+  }
+  body.bg-dark {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+  }
+  .card.bg-dark {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    transition: background-color 0.3s, color 0.3s;
+  }
+</style>
+</head>
+<body class="bg-light text-dark">
+<div class="container py-4">
+  <!-- Header with buttons -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>🛠️ User Management</h2>
+    <div class="d-flex gap-2">
+      <a href="/" class="btn btn-outline-primary btn-sm">← Back to Port Scanner</a>
+      <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+      <button id="toggle-theme" class="btn btn-outline-secondary btn-sm">Toggle Dark Mode</button>
+    </div>
+  </div>
+
+  <!-- Add User Form -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">Add New User</h5>
+      <form id="addUserForm" class="row g-3">
+        <div class="col-md-5">
+          <input type="text" id="newUsername" class="form-control" placeholder="Username" required />
+        </div>
+        <div class="col-md-5">
+          <input type="password" id="newPassword" class="form-control" placeholder="Password" required />
+        </div>
+        <div class="col-md-2 d-grid">
+          <button type="submit" class="btn btn-primary">Add User</button>
+        </div>
+      </form>
+      <div id="addUserMsg" class="mt-2"></div>
+    </div>
+  </div>
+
+  <!-- Users List -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Existing Users</h5>
+      <ul id="usersList" class="list-group"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Dark mode toggle
+  const toggleBtn = document.getElementById("toggle-theme");
+
+  toggleBtn.addEventListener("click", () => {
+    document.body.classList.toggle("bg-dark");
+    document.body.classList.toggle("text-light");
+
+    document.querySelectorAll(".card").forEach(card => {
+      card.classList.toggle("bg-dark");
+      card.classList.toggle("text-light");
+    });
+  });
+
+  const usersList = document.getElementById('usersList');
+  const addUserForm = document.getElementById('addUserForm');
+  const addUserMsg = document.getElementById('addUserMsg');
+
+  // Fetch and display users
+  async function fetchUsers() {
+    usersList.innerHTML = '<li class="list-group-item">Loading users...</li>';
+    try {
+      const res = await fetch('/admin/users');
+      if (!res.ok) throw new Error('Failed to fetch users');
+      const users = await res.json();
+      if (users.length === 0) {
+        usersList.innerHTML = '<li class="list-group-item">No users found.</li>';
+        return;
+      }
+      usersList.innerHTML = '';
+      users.forEach(username => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.textContent = username;
+        const delBtn = document.createElement('button');
+        delBtn.className = 'btn btn-sm btn-danger';
+        delBtn.textContent = 'Delete';
+        delBtn.onclick = () => deleteUser(username);
+        li.appendChild(delBtn);
+        usersList.appendChild(li);
+      });
+    } catch (err) {
+      usersList.innerHTML = `<li class="list-group-item text-danger">Error loading users: ${err.message}</li>`;
+    }
+  }
+
+  // Add new user
+  addUserForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    addUserMsg.textContent = '';
+    const username = document.getElementById('newUsername').value.trim();
+    const password = document.getElementById('newPassword').value.trim();
+
+    if (!username || !password) {
+      addUserMsg.textContent = 'Username and password are required.';
+      addUserMsg.className = 'text-danger';
+      return;
+    }
+
+    try {
+      const res = await fetch('/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (res.ok) {
+        addUserMsg.textContent = `User "${username}" added successfully!`;
+        addUserMsg.className = 'text-success';
+        addUserForm.reset();
+        fetchUsers();
+      } else {
+        const err = await res.text();
+        addUserMsg.textContent = `Failed to add user: ${err}`;
+        addUserMsg.className = 'text-danger';
+      }
+    } catch (err) {
+      addUserMsg.textContent = `Error: ${err.message}`;
+      addUserMsg.className = 'text-danger';
+    }
+  });
+
+  // Delete user
+  async function deleteUser(username) {
+    if (!confirm(`Are you sure you want to delete user "${username}"?`)) return;
+
+    try {
+      const res = await fetch(`/admin/users/${encodeURIComponent(username)}`, {
+        method: 'DELETE',
+      });
+
+      if (res.status === 204) {
+        fetchUsers();
+      } else {
+        const err = await res.text();
+        alert(`Failed to delete user: ${err}`);
+      }
+    } catch (err) {
+      alert(`Error deleting user: ${err.message}`);
+    }
+  }
+
+  // Initial load
+  fetchUsers();
+</script>
+</body>
+</html>
