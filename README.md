@@ -1,6 +1,6 @@
 <b><u>Web UX/UI Port Scanner Tool</u></b>
 
-Free online port scanner tool that identifies all open ports on your chosen IP address. The Port Scanner Tool also tries to identify the services that are running on the open ports.
+Free online scanner tool that identifies all open ports on your chosen IP address. The Port Scanner Tool also tries to identify the services that are running on the open ports.
 <br>
 <br>
 <b><u>Instructions:</u></b>
