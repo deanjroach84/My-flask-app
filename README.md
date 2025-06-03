@@ -11,7 +11,7 @@ Free online port scanner tool that identifies all open ports on your chosen IP a
 
 <b>Step 2:</b>
 <br>
-<i>Select ports to scan (eg 100, 1000, custom number)</i>
+<i>Select ports to scan (eg 100, 1000, custom number 1 - 99,999)</i>
 
 <b>Step 3:</b>
 <br>
