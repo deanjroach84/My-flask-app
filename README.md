@@ -1,22 +1,22 @@
-Web UX/UI Port Scanner Tool
+<b><u>Web UX/UI Port Scanner Tool</u></b>
 
-Free online port scanner tool that identifies all open ports on your chosen IP address. The Port Scanner Tool also tries to identify the services that are running on the open ports.
+<i>Free online port scanner tool that identifies all open ports on your chosen IP address. The Port Scanner Tool also tries to identify the services that are running on the open ports.<i>
+<br>
+
+<b><u>Instructions:</u></b>
+
+<b>Step 1:</b>
+<i>Input target IP address</i>
+
+<b>Step 2:</b>
+<br>
+<i>Select ports to scan (eg 100, 1000, custom number)</i>
+
+<b>Step 3:</b>
+<i>Click "Start Scan" Button</i>
 
 
-Instructions:
-
-Step 1:
-Input target IP address
-
-Step 2: 
-Select ports to scan (eg 100, 1000, custom number)
-
-Step 3: 
-Click "Start Scan" Button
-
-
-
-Scanner Tool includes the following features:
+<b>Scanner Tool includes the following features:</b>
 - Dark mode activated at the touch of a button
 - Create a new user account to use Scanner tool
 - Forgot password function which allows changing current password of user if forgotten.
@@ -24,6 +24,6 @@ Scanner Tool includes the following features:
 
 Scanner Tool also includes an Admin Portal which is accessible once logged in using default credentials.
 
-<b>Default Credentials:</b>
-Username: admin
-Password: admin123
+<b><u>Default Credentials:</u></b>
+<i>Username: admin</i>
+<i>Password: admin123</i>
