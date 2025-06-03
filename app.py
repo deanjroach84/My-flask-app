@@ -1,4 +1,5 @@
 import json
+import os
 import socket
 import threading
 import uuid
@@ -264,12 +265,6 @@ def stop_scan(scan_id):
 
     return jsonify({'error': 'Scan ID not found'}), 404
 
-
 if __name__ == '__main__':
-    app.run(debug=True)
-
-import os
-
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
