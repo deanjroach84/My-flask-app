@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: my-flask-app
+    name: Scanner_Tool
     env: python
     buildCommand: ""
     startCommand: "python app.py"
