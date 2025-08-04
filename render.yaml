@@ -2,6 +2,11 @@ services:
   - type: web
     name: Scanner_Tool
     env: python
-    buildCommand: ""
-    startCommand: "python app.py"
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
     plan: free
+    envVars:
+      - key: PORT
+        value: 10000  # Optional: Render assigns this automatically if omitted
+      - key: FLASK_ENV
+        value: production
