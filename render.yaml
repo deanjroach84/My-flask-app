@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: Scanner_Tool
+    name: Scanner-Tool
     env: python
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn app:app"
