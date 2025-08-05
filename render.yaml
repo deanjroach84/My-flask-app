@@ -9,5 +9,3 @@ services:
     envVars:
       - key: FLASK_ENV
         value: production
-      - key: SECRET_KEY
-        value: your-secret-key-here  # replace with a secure key or set via Render UI
