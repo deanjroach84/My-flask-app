@@ -9,3 +9,5 @@ services:
     envVars:
       - key: FLASK_ENV
         value: production
+      - key: PORT
+        value: 10000
