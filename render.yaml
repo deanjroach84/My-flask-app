@@ -1,8 +1,12 @@
 services:
   - type: web
-    name: Scanner_Tool
+    name: scanner-tool
     env: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn app:app"
+    repo: https://github.com/deanjroach84/My-flask-app.git
     plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
     autoDeploy: true
+    envVars:
+      - key: FLASK_ENV
+        value: production
