@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: My-flask-app
+    name: Scanner_Tool
     env: python
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn app:app"
