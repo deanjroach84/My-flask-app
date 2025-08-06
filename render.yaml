@@ -2,6 +2,7 @@ services:
   - type: web
     name: Scanner_Tool
     env: python
-    buildCommand: ""
+    buildCommand: "pip install -r requirements.txt"
     startCommand: "python app.py"
     plan: free
+    autoDeploy: true
