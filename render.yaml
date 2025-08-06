@@ -2,7 +2,12 @@ services:
   - type: web
     name: Scanner_Tool
     env: python
+    plan: free
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn app:app"
-    plan: free
     autoDeploy: true
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PORT
+        value: 10000
