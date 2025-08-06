@@ -3,6 +3,7 @@ import os
 import socket
 import threading
 import uuid
+
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -268,5 +269,3 @@ def stop_scan(scan_id):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=True)
-
-
