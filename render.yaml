@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: Scanner_Tool
+    name: scanner-tool
     env: python
     repo: https://github.com/deanjroach84/My-flask-app.git
     plan: free
