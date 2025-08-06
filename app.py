@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__, static_folder='static')
 
-app.secret_key = 'd0e24c18990ede4030506468331087c351d8d775d276597e7fc8035360f30059'
+app.secret_key = 'os.environ.get('SECRET_KEY')'
 
 USERS_FILE = 'users.json'
 
@@ -269,6 +269,7 @@ def stop_scan(scan_id):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=True)
+
 
 
 
