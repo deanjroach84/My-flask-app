@@ -7,6 +7,3 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
     autoDeploy: true
-    envVars:
-      - key: FLASK_ENV
-        value: production
