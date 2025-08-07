@@ -10,3 +10,5 @@ services:
     envVars:
       - key: FLASK_ENV
         value: production
+      - key: SECRET_KEY
+        value: your-super-secret-key
