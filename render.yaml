@@ -10,8 +10,3 @@ services:
     envVars:
       - key: FLASK_ENV
         value: production
-      - key: SECRET_KEY
-        value: ""
-        # value: d0e24c18990ede4030506468331087c351d8d775d276597e7fc8035360f30059
-        # Value is set securely in the Render dashboard.
-        # d0e24c18990ede4030506468331087c351d8d775d276597e7fc8035360f30059
