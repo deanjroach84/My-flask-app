@@ -5,7 +5,7 @@ services:
     repo: https://github.com/deanjroach84/My-flask-app.git
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: python app.py
     autoDeploy: true
     envVars:
       - key: FLASK_ENV
