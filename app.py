@@ -12,10 +12,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # --- Flask app setup ---
 app = Flask(__name__, static_folder='static')
-app.secret_key = os.environ.get(
-    'd0e24c18990ede4030506468331087c351d8d775d276597e7fc8035360f30059',
-    'change-this-in-production'
-)
+app.secret_key = os.environ.get('SECRET_KEY', 'change-this-in-production')
 
 USERS_FILE = 'users.json'
 scans = {}  # Stores scan results keyed by scan_id
@@ -234,3 +231,4 @@ def stop_scan(scan_id):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))  # Render sets this automatically
     app.run(host='0.0.0.0', port=port)
+
