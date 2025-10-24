@@ -4,13 +4,8 @@ import socket
 import threading
 import uuid
 import sqlite3
-
 from datetime import datetime
-
-from flask import (
-    Flask, render_template, request, session,
-    redirect, url_for, jsonify, flash
-)
+from flask import Flask, render_template, request, session, redirect, url_for, jsonify, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # --- Flask app setup ---
@@ -42,7 +37,6 @@ def init_db():
 
 init_db()
 
-# --- Common port-to-service mapping ---
 common_services = {
     20: 'FTP Data', 21: 'FTP Control', 22: 'SSH', 23: 'Telnet',
     25: 'SMTP', 53: 'DNS', 80: 'HTTP', 110: 'POP3',
@@ -97,7 +91,7 @@ def scan_ports(scan_id, target_ip, start_port, end_port, username):
 
     scans[scan_id]['done'] = True
 
-    # ✅ Save results to the database
+    # Save results to database
     open_ports = scans[scan_id]['open_ports']
     with get_db_connection() as conn:
         conn.execute(
@@ -116,48 +110,6 @@ def index():
         return redirect(url_for('login'))
     return render_template('index.html')
 
-@app.route('/admin')
-def admin_page():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    return app.send_static_file('admin.html')
-
-# --- Admin User API ---
-@app.route('/admin/users', methods=['GET'])
-def admin_get_users():
-    if 'user' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-    return jsonify(list(users.keys()))
-
-@app.route('/admin/users', methods=['POST'])
-def admin_add_user():
-    if 'user' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-    data = request.get_json()
-    username = data.get('username', '').strip()
-    password = data.get('password')
-
-    if not username or not password:
-        return "Username and password required", 400
-    if username in users:
-        return "User already exists", 400
-
-    users[username] = generate_password_hash(password)
-    save_users(users)
-    return "User added", 201
-
-@app.route('/admin/users/<username>', methods=['DELETE'])
-def admin_delete_user(username):
-    if 'user' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-    if username not in users:
-        return "User not found", 404
-
-    del users[username]
-    save_users(users)
-    return '', 204
-
-# --- Authentication ---
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -169,138 +121,8 @@ def login():
         return render_template('login.html', error="Invalid credentials.")
     return render_template('login.html')
 
-@app.route('/logout')
-def logout():
-    session.pop('user', None)
-    return redirect(url_for('login'))
+# (Include other routes here exactly as in your original app)
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        username = request.form['username'].strip()
-        password = request.form['password']
-        if not username or not password:
-            return render_template('register.html', error="Please fill in all fields.")
-        if register_user(username, password):
-            return redirect(url_for('login'))
-        return render_template('register.html', error="Username already exists.")
-    return render_template('register.html')
-
-@app.route('/forgot_password', methods=['GET', 'POST'])
-def forgot_password():
-    global users
-    if request.method == 'POST':
-        username = request.form['username'].strip()
-        new_password = request.form['new_password']
-
-        if username not in users:
-            flash('Username not found.', 'danger')
-            return redirect(url_for('forgot_password'))
-
-        users[username] = generate_password_hash(new_password)
-        save_users(users)
-
-        flash('Password updated successfully! Please login.', 'success')
-        return redirect(url_for('login'))
-
-    return render_template('forgot_password.html')
-
-# --- Port scanning endpoints ---
-@app.route('/start_scan', methods=['POST'])
-def start_scan():
-    if 'user' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-
-    data = request.get_json() or request.form
-    target_ip = data.get('ip') or data.get('target_ip')
-    ports = data.get('ports')
-
-    try:
-        start_port = 1
-        end_port = int(ports) if ports else 100
-    except Exception:
-        return jsonify({'error': 'Invalid ports parameter'}), 400
-
-    if not target_ip:
-        return jsonify({'error': 'No target IP provided'}), 400
-
-    scan_id = str(uuid.uuid4())
-    thread = threading.Thread(target=scan_ports, args=(scan_id, target_ip, start_port, end_port, session['user']))
-    thread.start()
-
-    return jsonify({'scan_id': scan_id})
-
-@app.route('/scan_status/<scan_id>')
-def scan_status(scan_id):
-    if 'user' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-
-    if scan_id not in scans:
-        return jsonify({'error': 'Scan ID not found'}), 404
-
-    scan = scans[scan_id]
-    total = scan.get('total_ports', 1)
-    scanned = scan.get('scanned_ports', 0)
-    progress = int((scanned / total) * 100) if total > 0 else 0
-    results = [[port, get_service_name(port)] for port in scan['open_ports']]
-
-    return jsonify({
-        'progress': progress,
-        'done': scan.get('done', False),
-        'results': results
-    })
-
-@app.route('/stop_scan/<scan_id>', methods=['POST'])
-def stop_scan(scan_id):
-    if 'user' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-
-    if scan_id in scans:
-        scans.pop(scan_id)
-        return jsonify({'message': 'Scan stopped.'})
-
-    return jsonify({'error': 'Scan ID not found'}), 404
-
-@app.route('/scan_history')
-def scan_history():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-
-    username = session['user']
-    with get_db_connection() as conn:
-        rows = conn.execute(
-            "SELECT * FROM scan_history WHERE username = ? ORDER BY timestamp DESC",
-            (username,)
-        ).fetchall()
-
-    history = [
-        {
-            'id': row['id'],
-            'target_ip': row['target_ip'],
-            'open_ports': json.loads(row['open_ports']),
-            'total_ports': row['total_ports'],
-            'timestamp': row['timestamp']
-        }
-        for row in rows
-    ]
-    return render_template('history.html', history=history)
-
-@app.route('/delete_scan/<scan_id>', methods=['POST'])
-def delete_scan(scan_id):
-    if 'user' not in session:
-        return jsonify({'error': 'Unauthorized'}), 401
-
-    username = session['user']
-
-    with get_db_connection() as conn:
-        # Ensure users can only delete their own scans
-        conn.execute("DELETE FROM scan_history WHERE id = ? AND username = ?", (scan_id, username))
-        conn.commit()
-
-    return jsonify({'message': 'Scan deleted successfully'})
-
-# --- Entry point ---
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))  # Render sets this automatically
-    app.run(host='0.0.0.0', port=port)
-
+# --- Vercel serverless handler ---
+from mangum import Mangum
+handler = Mangum(app)
