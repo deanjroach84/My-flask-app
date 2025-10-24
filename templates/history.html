@@ -4,17 +4,45 @@
     <meta charset="UTF-8">
     <title>Scan History</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        function deleteScan(scanId, element) {
+            if (!confirm("Are you sure you want to delete this scan?")) return;
+
+            fetch(`/delete_scan/${scanId}`, {
+                method: "POST"
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.message) {
+                    element.closest("li").remove();
+                } else {
+                    alert("Failed to delete scan.");
+                }
+            })
+            .catch(() => alert("Error deleting scan."));
+        }
+    </script>
 </head>
 <body class="bg-light text-dark p-4">
-    <h3>📜 Your Scan History</h3>
-    <a href="/" class="btn btn-sm btn-outline-primary mb-3">← Back to Scanner</a>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>📜 Your Scan History</h3>
+        <a href="/" class="btn btn-sm btn-outline-primary">← Back to Scanner</a>
+    </div>
 
     {% if history %}
         <ul class="list-group">
         {% for scan in history %}
-            <li class="list-group-item">
-                <strong>{{ scan.target_ip }}</strong> ({{ scan.timestamp }})<br>
-                Open Ports: {{ scan.open_ports | join(', ') if scan.open_ports else 'None' }}
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                    <strong>{{ scan.target_ip }}</strong> ({{ scan.timestamp }})<br>
+                    Open Ports: {{ scan.open_ports | join(', ') if scan.open_ports else 'None' }}
+                </div>
+                <button
+                    class="btn btn-sm btn-outline-danger"
+                    onclick="deleteScan('{{ scan.id }}', this)"
+                >
+                    Delete
+                </button>
             </li>
         {% endfor %}
         </ul>
