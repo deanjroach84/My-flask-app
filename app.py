@@ -3,6 +3,9 @@ import os
 import socket
 import threading
 import uuid
+import sqlite3
+
+from datetime import datetime
 
 from flask import (
     Flask, render_template, request, session,
@@ -16,6 +19,28 @@ app.secret_key = os.environ.get('SECRET_KEY', 'change-this-in-production')
 
 USERS_FILE = 'users.json'
 scans = {}  # Stores scan results keyed by scan_id
+DB_FILE = "scan_history.db"
+
+def get_db_connection():
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    with get_db_connection() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS scan_history (
+                id TEXT PRIMARY KEY,
+                username TEXT NOT NULL,
+                target_ip TEXT NOT NULL,
+                open_ports TEXT,
+                total_ports INTEGER,
+                timestamp TEXT NOT NULL
+            )
+        """)
+        conn.commit()
+
+init_db()
 
 # --- Common port-to-service mapping ---
 common_services = {
@@ -52,7 +77,7 @@ def register_user(username, password):
     return True
 
 # --- Port scanning logic ---
-def scan_ports(scan_id, target_ip, start_port, end_port):
+def scan_ports(scan_id, target_ip, start_port, end_port, username):
     scans[scan_id] = {
         'open_ports': [],
         'total_ports': end_port - start_port + 1,
@@ -71,6 +96,15 @@ def scan_ports(scan_id, target_ip, start_port, end_port):
             scans[scan_id]['scanned_ports'] += 1
 
     scans[scan_id]['done'] = True
+
+    # ✅ Save results to the database
+    open_ports = scans[scan_id]['open_ports']
+    with get_db_connection() as conn:
+        conn.execute(
+            "INSERT INTO scan_history (id, username, target_ip, open_ports, total_ports, timestamp) VALUES (?, ?, ?, ?, ?, ?)",
+            (scan_id, username, target_ip, json.dumps(open_ports), end_port, datetime.now().isoformat())
+        )
+        conn.commit()
 
 def get_service_name(port):
     return common_services.get(port, "Open")
@@ -191,7 +225,7 @@ def start_scan():
         return jsonify({'error': 'No target IP provided'}), 400
 
     scan_id = str(uuid.uuid4())
-    thread = threading.Thread(target=scan_ports, args=(scan_id, target_ip, start_port, end_port))
+    thread = threading.Thread(target=scan_ports, args=(scan_id, target_ip, start_port, end_port, session['user']))
     thread.start()
 
     return jsonify({'scan_id': scan_id})
@@ -226,6 +260,30 @@ def stop_scan(scan_id):
         return jsonify({'message': 'Scan stopped.'})
 
     return jsonify({'error': 'Scan ID not found'}), 404
+
+@app.route('/scan_history')
+def scan_history():
+    if 'user' not in session:
+        return redirect(url_for('login'))
+
+    username = session['user']
+    with get_db_connection() as conn:
+        rows = conn.execute(
+            "SELECT * FROM scan_history WHERE username = ? ORDER BY timestamp DESC",
+            (username,)
+        ).fetchall()
+
+    history = [
+        {
+            'id': row['id'],
+            'target_ip': row['target_ip'],
+            'open_ports': json.loads(row['open_ports']),
+            'total_ports': row['total_ports'],
+            'timestamp': row['timestamp']
+        }
+        for row in rows
+    ]
+    return render_template('history.html', history=history)
 
 # --- Entry point ---
 if __name__ == '__main__':
