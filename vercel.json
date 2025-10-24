@@ -1,14 +1,13 @@
+
 {
   "builds": [
-    {
-      "src": "app.py",
-      "use": "@vercel/python"
-    }
+    { "src": "app.py", "use": "@vercel/python" }
   ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/app.py"
-    }
-  ]
+    { "src": "/(.*)", "dest": "/app.py" }
+  ],
+  "env": {
+    "FLASK_ENV": "production",
+    "SECRET_KEY": "d0e24c18990ede4030506468331087d276597e7fc8035360f30059"
+  }
 }
