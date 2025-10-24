@@ -285,6 +285,20 @@ def scan_history():
     ]
     return render_template('history.html', history=history)
 
+@app.route('/delete_scan/<scan_id>', methods=['POST'])
+def delete_scan(scan_id):
+    if 'user' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    username = session['user']
+
+    with get_db_connection() as conn:
+        # Ensure users can only delete their own scans
+        conn.execute("DELETE FROM scan_history WHERE id = ? AND username = ?", (scan_id, username))
+        conn.commit()
+
+    return jsonify({'message': 'Scan deleted successfully'})
+
 # --- Entry point ---
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))  # Render sets this automatically
